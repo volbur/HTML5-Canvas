@@ -5,6 +5,7 @@ const KEYS = {
 };
 
 let game = {
+  running: true,
   ctx: null,
   platform: null,
   ball: null,
@@ -68,6 +69,7 @@ let game = {
     this.collideBlocks();
     this.collidePlatform();
     this.ball.collideWorldBounds();
+    this.platform.collideWorldBounds();
     this.platform.move();
     this.ball.move();
   },
@@ -84,11 +86,13 @@ let game = {
     }
   },
   run() {
-    window.requestAnimationFrame(() => {
-      this.update();
-      this.render();
-      this.run();
-    });
+    if (this.running) {
+      window.requestAnimationFrame(() => {
+        this.update();
+        this.render();
+        this.run();
+      });
+    }
   },
   render() {
     this.ctx.clearRect(0, 0, this.width, this.height);
@@ -184,7 +188,9 @@ game.ball = {
       this.y = 0;
       this.dy = this.velocity;
     } else if (ballBottom > worldBottom) {
-      console.log('game over');
+      game.running = false;
+      alert('Вы проиграли');
+      window.location.reload();
     }
   },
   bumpBlock(block) {
@@ -192,6 +198,10 @@ game.ball = {
     block.active = false;
   },
   bumpPlatform(platform) {
+    if (platform.dx) {
+      this.x += platform.dx;
+    }
+
     if (this.dy > 0) {
       this.dy = -this.velocity;
       let touchX = this.x + this.width / 2;
@@ -237,6 +247,17 @@ game.platform = {
     let offset = this.width - diff;
     let result = (2 * offset) / this.width;
     return result - 1;
+  },
+  collideWorldBounds() {
+    let x = this.x + this.dx;
+    let platformLeft = x;
+    let platformRight = platformLeft + this.width;
+    let worldLeft = 0;
+    let worldRight = game.width;
+
+    if (platformLeft < worldLeft || platformRight > worldRight) {
+      this.dx = 0;
+    }
   },
 };
 
