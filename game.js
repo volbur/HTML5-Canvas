@@ -132,7 +132,7 @@ let game = {
     this.ctx.drawImage(this.sprites.background, 0, 0);
     this.ctx.drawImage(
       this.sprites.ball,
-      0,
+      this.ball.frame * this.ball.width,
       0,
       this.ball.width,
       this.ball.height,
@@ -172,6 +172,7 @@ let game = {
 game.ball = {
   dx: 0,
   dy: 0,
+  frame: 0,
   velocity: 3,
   x: 320,
   y: 280,
@@ -180,6 +181,15 @@ game.ball = {
   start() {
     this.dy = -this.velocity;
     this.dx = game.random(-this.velocity, this.velocity);
+    this.animate();
+  },
+  animate() {
+    setInterval(() => {
+      ++this.frame;
+      if (this.frame > 3) {
+        this.frame = 0;
+      }
+    }, 100);
   },
   move() {
     if (this.dy) {
